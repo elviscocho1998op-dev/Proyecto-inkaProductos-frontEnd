@@ -1,0 +1,62 @@
+<div class="container mt-4">
+    <div class="card shadow border-0">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">📦 Gestión de Inventario</h4>
+        @if (esTI) {
+          <button class="btn btn-light btn-sm">+ Nuevo Producto</button>
+        }
+      </div>
+      <div class="card-body">
+        <table class="table table-hover mt-2">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>SKU</th> 
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (prod of listaProductos; track prod.productoId) {
+              <tr>
+                <td>{{ prod.productoId }}</td>
+                <td><span class="badge bg-secondary">{{ prod.sku }}</span></td>
+                <td><strong>{{ prod.nombre }}</strong></td>
+                <td class="text-muted small">{{ prod.descripcion || 'Sin descripción' }}</td>
+                
+                <td>{{ prod.precioLista | currency:'PEN ':'symbol' }}</td>
+                
+                <td>
+                  <span [class]="(prod.stock || 0) < 10 ? 'badge bg-danger' : 'badge bg-success'">
+                    {{ prod.stock || 0 }}
+                  </span>
+                </td>
+                <td>
+                  @if (esTI) {
+                    <button class="btn btn-outline-info btn-sm me-2">
+                      <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button (click)="eliminar(prod.productoId)" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                  } @else {
+                    <span class="badge rounded-pill bg-light text-dark border">Solo lectura</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                  <i class="bi bi-box-seam d-block mb-2" style="font-size: 2rem;"></i>
+                  No hay productos registrados en la base de datos.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
