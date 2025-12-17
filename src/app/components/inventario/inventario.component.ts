@@ -12,47 +12,55 @@ import { Producto } from '../../models/producto.models';
 })
 export class InventarioComponent implements OnInit {
   listaProductos: Producto[] = [];
-  
-  // 1. Variable para controlar quién puede ver los botones
   esTI: boolean = false;
+  
+  // Guardamos qué seleccionó el usuario para enviarlo al servicio
+  catSeleccionada: number = 0;
+  almSeleccionado: number = 0;
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.cargarProductos();
-    // 2. Ejecutamos la validación al cargar el componente
     this.verificarRol();
   }
 
-  // 3. Lógica para leer el rol del localStorage
   verificarRol() {
     const userData = localStorage.getItem('user_data');
     if (userData) {
       const user = JSON.parse(userData);
-      // Revisamos si el usuario tiene el rol de TI
-      // Importante: Verifica si en tu consola sale 'TI' o 'ROLE_TI' según tu Java
       this.esTI = user.roles && user.roles.includes('TI'); 
-      console.log('¿Es usuario de TI?:', this.esTI);
     }
   }
 
   cargarProductos() {
     this.apiService.getProductos().subscribe({
-      next: (data) => {
-        this.listaProductos = data;
-        console.log('Productos cargados:', data);
-      },
-      error: (err) => {
-        console.error('Error al conectar con Spring Boot:', err);
-      }
+      next: (data) => this.listaProductos = data,
+      error: (err) => console.error('Error al cargar productos:', err)
     });
   }
 
-  // 4. Función para el botón Eliminar (la usaremos pronto)
+  // Esta función se activa cuando mueves los filtros en el HTML
+  aplicarFiltro(event: any, tipo: string) {
+    const valor = Number(event.target.value);
+    if (tipo === 'categoria') {
+      this.catSeleccionada = valor;
+    } else {
+      this.almSeleccionado = valor;
+    }
+
+    this.apiService.filtrarProductos(this.catSeleccionada, this.almSeleccionado).subscribe({
+      next: (data) => this.listaProductos = data,
+      error: (err) => console.error('Error al filtrar:', err)
+    });
+  }
+
   eliminar(id?: number) {
     if (id && confirm('¿Estás seguro de eliminar este producto?')) {
-      console.log('Eliminando producto:', id);
-      // Aquí llamaremos al servicio más adelante
+      this.apiService.eliminarProducto(id).subscribe({
+        next: () => this.cargarProductos(),
+        error: (err) => console.error('Error al eliminar:', err)
+      });
     }
   }
 }
