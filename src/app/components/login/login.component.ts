@@ -16,19 +16,17 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  // ... (mismos imports de antes)
-
   onLogin() {
-    this.authService.login(this.email, this.password).subscribe({
-      next: (usuario) => {
-        console.log('Bienvenido:', usuario.nombre);
-        this.authService.setSession(usuario); // Guardamos el objeto que mandó Java
-        this.router.navigate(['/inicio']); 
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Error: Correo o contraseña incorrectos');
-      }
-    });
+    if (!this.email || !this.password) {
+      alert('Por favor, ingrese sus credenciales');
+      return;
+    }
+
+    // Opción A: no llamamos al backend aquí.
+    // Guardamos credenciales para que el interceptor mande Basic Auth en cada request.
+    this.authService.login(this.email.trim(), this.password);
+
+    // Redirigimos al inicio
+    this.router.navigate(['/inicio']);
   }
 }

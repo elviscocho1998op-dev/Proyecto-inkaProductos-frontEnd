@@ -1,0 +1,78 @@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold mb-0 text-primary">⚖️ Bandeja de Aprobaciones</h3>
+        <p class="text-muted">Gestione las solicitudes de inventario pendientes de revisión.</p>
+      </div>
+      <button class="btn btn-outline-secondary btn-sm" (click)="cargarPendientes()">
+        <i class="bi bi-arrow-clockwise"></i> Actualizar
+      </button>
+    </div>
+  
+    <div class="table-responsive shadow-sm rounded">
+      <table class="table table-hover align-middle bg-white mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th class="ps-3">Solicitante</th>
+            <th>Origen ➔ Destino</th>
+            <th>Fecha</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of solicitudesPendientes; track item.solicitudId) {
+            <tr>
+              <td class="ps-3">
+                <div class="fw-bold">{{ item.usuarioSolicitante }}</div>
+                <small class="text-muted">ID: #{{ item.solicitudId }}</small>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ item.origen?.nombre }}</span>
+                <i class="bi bi-arrow-right mx-2 text-secondary"></i>
+                <span class="badge bg-light text-dark border">{{ item.destino?.nombre }}</span>
+              </td>
+              <td>{{ item.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-success px-3" (click)="procesarSolicitud(item.solicitudId, 'APROBADA')">
+                    <i class="bi bi-check-lg"></i> Aprobar
+                  </button>
+                  <button class="btn btn-sm btn-danger px-3" (click)="procesarSolicitud(item.solicitudId, 'RECHAZADA')">
+                    <i class="bi bi-x-lg"></i> Rechazar
+                  </button>
+                  <button class="btn btn-sm btn-outline-primary" (click)="toggleDetalle(item.solicitudId)">
+                    <i class="bi" [ngClass]="detalleSeleccionado === item.solicitudId ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+  
+            @if (detalleSeleccionado === item.solicitudId) {
+              <tr class="bg-light">
+                <td colspan="4" class="p-3">
+                  <div class="card card-body border-0 shadow-sm mx-3">
+                    <h6 class="fw-bold text-secondary border-bottom pb-2">📦 Productos a mover:</h6>
+                    <ul class="list-group list-group-flush">
+                      @for (det of item.detalles; track det.id) {
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                          <span>{{ det.producto?.nombre }} <small class="text-muted">({{ det.producto?.sku }})</small></span>
+                          <span class="badge bg-primary rounded-pill">Cant: {{ det.cantidad }}</span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr>
+              <td colspan="4" class="text-center py-5">
+                <div class="text-muted">
+                  <i class="bi bi-check2-circle fs-1 text-success d-block mb-3"></i>
+                  <h5 class="fw-bold">¡Todo al día!</h5>
+                  <p>No hay solicitudes pendientes de aprobación en este momento.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>

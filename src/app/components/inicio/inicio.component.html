@@ -8,10 +8,10 @@
       <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm p-3 border-start border-primary border-5">
           <div class="card-body d-flex flex-column">
-            <h5 class="card-title fw-bold">Gestión de Productos</h5>
-            <p class="card-text text-muted flex-grow-1">Crea, edita y administra el catálogo de artículos.</p>
-            <a routerLink="/inventario" class="btn btn-primary w-100 mt-3 fw-bold">
-               Ir al Módulo
+            <h5 class="card-title fw-bold">Módulo de Compras</h5>
+            <p class="card-text text-muted flex-grow-1">Realiza traslados entre almacenes y gestiona nuevas entradas.</p>
+            <a routerLink="/compras" class="btn btn-primary w-100 mt-3 fw-bold">
+                Ir al Módulo
             </a>
           </div>
         </div>
@@ -21,9 +21,9 @@
         <div class="card h-100 border-0 shadow-sm p-3 border-start border-success border-5">
           <div class="card-body d-flex flex-column">
             <h5 class="card-title fw-bold">Historial</h5>
-            <p class="card-text text-muted flex-grow-1">Registra entradas, salidas y consulta el historial.</p>
-            <a routerLink="/inventario" class="btn btn-success w-100 mt-3 fw-bold">
-               Ver Historial
+            <p class="card-text text-muted flex-grow-1">Consulta el registro detallado de todas tus transacciones y traslados realizados.</p>
+            <a routerLink="/historial" class="btn btn-success w-100 mt-3 fw-bold">
+                Ver Historial
             </a>
           </div>
         </div>
@@ -33,9 +33,9 @@
         <div class="card h-100 border-0 shadow-sm p-3 border-start border-info border-5">
           <div class="card-body d-flex flex-column">
             <h5 class="card-title fw-bold">Inventario Actual</h5>
-            <p class="card-text text-muted flex-grow-1">Consulta el stock disponible por almacén.</p>
+            <p class="card-text text-muted flex-grow-1">Consulta el stock disponible por almacén en tiempo real.</p>
             <a routerLink="/inventario" class="btn btn-info text-white w-100 mt-3 fw-bold">
-               Ver Inventario
+                Ver Inventario
             </a>
           </div>
         </div>
@@ -45,11 +45,11 @@
         <div class="card border-0 shadow-sm p-3 border-start border-warning border-5">
           <div class="card-body d-flex justify-content-between align-items-center">
             <div>
-              <h5 class="card-title fw-bold">Configuración de Maestros</h5>
-              <p class="card-text text-muted mb-0">Administra categorías, unidades, almacenes y usuarios.</p>
+              <h5 class="card-title fw-bold">Gestión de Productos</h5>
+              <p class="card-text text-muted mb-0">Administra el catálogo: crea y edita artículos, categorías y almacenes.</p>
             </div>
-            <a routerLink="/inventario" class="btn btn-warning fw-bold px-5">
-               Ir a Configuración
+            <a routerLink="/gestion-producto" class="btn btn-warning fw-bold px-5">
+                Ir a Gestión
             </a>
           </div>
         </div>
@@ -59,7 +59,7 @@
     <div class="alert alert-primary mt-5 d-flex align-items-center" role="alert">
       <i class="bi bi-info-circle-fill me-2"></i>
       <div class="small">
-        <strong>Consejo:</strong> Empieza creando tus Categorías y Unidades de Medida en el menú Configuración para poder registrar tu primer producto.
+        <strong>Consejo:</strong> Usa el <strong>Módulo de Compras</strong> para mover stock entre tus almacenes y el <strong>Historial</strong> para auditar los cambios.
       </div>
     </div>
 </div>

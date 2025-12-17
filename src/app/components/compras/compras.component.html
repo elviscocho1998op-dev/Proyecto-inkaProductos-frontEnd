@@ -1,0 +1,144 @@
+<div class="container mt-4">
+    <div class="card shadow border-0">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">🛒 Módulo de Compras y Traslados</h4>
+        <span class="badge bg-light text-success fw-bold">Paso 1: Configurar Origen y Destino</span>
+      </div>
+      
+      <div class="card-body">
+        <div class="row g-3 mb-4 bg-dark text-white p-3 rounded shadow-sm">
+          <div class="col-md-5">
+            <label class="form-label fw-bold small text-uppercase text-secondary">Almacén de Origen</label>
+            <select class="form-select border-0 shadow-sm" [(ngModel)]="almacenOrigen">
+              <option value="1">Almacén Central (Lima)</option>
+              <option value="2">Almacén Sur (Arequipa)</option>
+              <option value="3">Almacén Norte (Trujillo)</option>
+              <option value="4">Almacén Callao (Callao)</option>
+            </select>
+          </div>
+          <div class="col-md-2 text-center align-self-end py-2">
+            <i class="bi bi-arrow-right-circle-fill fs-2 text-success"></i>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label fw-bold small text-uppercase text-secondary">Almacén de Destino</label>
+            <select class="form-select border-0 shadow-sm" [(ngModel)]="almacenDestino">
+              <option value="1">Almacén Central (Lima)</option>
+              <option value="2">Almacén Sur (Arequipa)</option>
+              <option value="3">Almacén Norte (Trujillo)</option>
+              <option value="4">Almacén Callao (Callao)</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="col-md-7">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0"><i class="bi bi-search"></i> Selección de Productos</h5>
+            </div>
+  
+            <div class="row g-2 mb-3 bg-light p-2 rounded border">
+              <div class="col-md-6">
+                <select class="form-select form-select-sm" (change)="aplicarFiltro($event, 'categoria')">
+                  <option value="0">-- Filtrar por Categoría --</option>
+                  <option value="1">Electrónica</option>
+                  <option value="2">Alimentos Secos</option>
+                  <option value="3">Mobiliario</option>
+                  <option value="4">Limpieza</option>
+                  <option value="5">Herramientas</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <select class="form-select form-select-sm" (change)="aplicarFiltro($event, 'almacen')">
+                  <option value="0">-- Ver Stock en otro Almacén --</option>
+                  <option value="1">Stock en Central</option>
+                  <option value="2">Stock en Sur</option>
+                  <option value="3">Stock en Norte</option>
+                  <option value="4">Stock en Callao</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="table-responsive border rounded bg-white">
+              <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Producto / SKU</th>
+                    <th class="text-center">Stock Disp.</th>
+                    <th style="width: 90px;">Cant.</th>
+                    <th class="text-center">Agregar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (prod of listaProductos; track prod.sku) {
+                    <tr>
+                      <td>
+                        <div class="fw-bold text-primary">{{ prod.nombre }}</div>
+                        <small class="text-muted">{{ prod.sku }}</small>
+                      </td>
+                      <td class="text-center">
+                        <span [class]="(prod.stock || 0) < 5 ? 'badge bg-danger' : 'badge bg-info text-dark'">
+                          {{ prod.stock }}
+                        </span>
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm text-center" 
+                               #cantInput value="1" min="1" [max]="prod.stock || 1">
+                      </td>
+                      <td class="text-center">
+                        <button class="btn btn-success btn-sm shadow-sm" (click)="agregarAlCarrito(prod, cantInput.value)">
+                          <i class="bi bi-cart-plus-fill"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="text-center py-4 text-muted">No hay productos disponibles con estos filtros.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+  
+          <div class="col-md-5">
+            <div class="card border-primary shadow-sm h-100">
+              <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cart-check"></i> Resumen de Operación</span>
+                <span class="badge bg-white text-primary rounded-pill">{{ carrito.length }} Items</span>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <ul class="list-group list-group-flush flex-grow-1 overflow-auto" style="max-height: 400px;">
+                  @for (item of carrito; track item.sku) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                      <div>
+                        <div class="fw-bold small">{{ item.nombre }}</div>
+                        <small class="text-muted">SKU: {{ item.sku }}</small>
+                      </div>
+                      <span class="badge bg-primary rounded-pill fs-6">x{{ item.cantidadSeleccionada }}</span>
+                    </li>
+                  } @empty {
+                    <li class="list-group-item text-center py-5 border-0">
+                      <i class="bi bi-cart-x text-light" style="font-size: 3rem;"></i>
+                      <p class="text-muted mt-2">El carrito está vacío.<br>Selecciona productos de la lista.</p>
+                    </li>
+                  }
+                </ul>
+                
+                <div class="mt-auto pt-3 border-top">
+                  <button class="btn btn-success w-100 py-2 fw-bold shadow" 
+                          (click)="confirmarTransaccion()" 
+                          [disabled]="carrito.length === 0">
+                    <i class="bi bi-check2-all"></i> CONFIRMAR TRASLADO
+                  </button>
+                  <button class="btn btn-link btn-sm w-100 mt-2 text-danger text-decoration-none" 
+                          *ngIf="carrito.length > 0" (click)="vaciarCarrito()">
+                    Vaciar Carrito
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service'; // ajusta ruta si difiere
 
 @Component({
   selector: 'app-navbar',
@@ -10,21 +11,22 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
-  usuarioNombre: string = 'Invitado';
+  rolLabel: string = 'Invitado';
+  emailLabel: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private auth: AuthService) {}
 
   ngOnInit() {
-    const data = localStorage.getItem('user_data');
-    if (data) {
-      const usuario = JSON.parse(data);
-      // Ajuste: Usamos 'username' porque así lo devuelve Spring Security In-Memory
-      this.usuarioNombre = usuario.username || usuario.nombre || 'Usuario';
-    }
+    const email = this.auth.getEmail?.() ?? localStorage.getItem('auth_email'); // por si aún no agregas getEmail()
+    this.emailLabel = email ?? '';
+
+    // Solo para mostrar (UI). La seguridad real está en Spring.
+    const hint = this.auth.getRoleHint?.() ?? null;
+    this.rolLabel = hint ?? (this.emailLabel ? 'Usuario' : 'Invitado');
   }
 
   onLogout() {
-    localStorage.removeItem('user_data');
+    this.auth.logout();
     this.router.navigate(['/login']);
   }
 }
