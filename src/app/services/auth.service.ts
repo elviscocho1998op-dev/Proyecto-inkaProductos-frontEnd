@@ -1,43 +1,68 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private emailKey = 'auth_email';
-  private passKey  = 'auth_pass';
 
-  login(email: string, password: string) {
-    localStorage.setItem(this.emailKey, email);
-    localStorage.setItem(this.passKey, password);
+  private apiUrl = 'http://localhost:8081/api/auth/login';
+
+  constructor(private http: HttpClient) {}
+
+  login(email: string, password: string): Observable<any> {
+    return this.http.post(this.apiUrl, { email, password });
   }
 
-  logout() {
-    localStorage.removeItem(this.emailKey);
-    localStorage.removeItem(this.passKey);
+  guardarUsuario(usuario: any, password: string) {
+    usuario.password = password;
+    localStorage.setItem("usuario", JSON.stringify(usuario));
   }
 
-  isLoggedIn(): boolean {
-    return !!this.getAuthHeader();
+  obtenerUsuario() {
+    const data = localStorage.getItem("usuario");
+    return data ? JSON.parse(data) : null;
   }
 
-  getAuthHeader(): string | null {
-    const email = localStorage.getItem(this.emailKey);
-    const pass  = localStorage.getItem(this.passKey);
-    if (!email || !pass) return null;
-    return 'Basic ' + btoa(`${email}:${pass}`);
+  cerrarSesion() {
+    localStorage.removeItem("usuario");
   }
 
-  getEmail(): string | null {
-    return localStorage.getItem(this.emailKey);
+  // ===============================
+  // ★★ FIX CRÍTICO — getRol correcto
+  // ===============================
+  getRol(): string {
+    const usuario = this.obtenerUsuario();
+    if (!usuario) return '';
+
+    // Intentar todas las formas posibles
+    let rol =
+      usuario.rol ||
+      usuario.role ||
+      usuario.roles?.[0]?.nombre ||
+      usuario.authorities?.[0]?.authority;
+
+    if (!rol) return '';
+
+    // Si viene como ROLE_ADMIN → ADMIN
+    if (rol.startsWith("ROLE_")) {
+      rol = rol.substring(5);
+    }
+
+    return rol;
   }
-  
-  // Opcional: para mostrar/ocultar botones por “rol” sin pedirle al backend
-  // (ojo: esto es SOLO UI, la seguridad real la impone el backend)
-  getRoleHint(): 'ADMIN' | 'USER' | 'TI' | null {
-    const email = localStorage.getItem(this.emailKey);
-    if (!email) return null;
-    if (email === 'admin@inkaproductos.com') return 'ADMIN';
-    if (email === 'user@inkaproductos.com') return 'USER';
-    if (email === 'gestionti@inkaproductos.com') return 'TI';
-    return null;
+
+  getEmail(): string {
+    const usuario = this.obtenerUsuario();
+    return usuario ? usuario.email : '';
+  }
+
+  getAuthHeader() {
+    const usuario = this.obtenerUsuario();
+    if (!usuario) return null;
+
+    const basic = btoa(`${usuario.email}:${usuario.password}`);
+    return `Basic ${basic}`;
   }
 }

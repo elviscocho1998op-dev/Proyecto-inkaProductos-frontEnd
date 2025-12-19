@@ -1,78 +1,44 @@
 <div class="container mt-4">
-    <div class="card shadow border-0">
-      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">📦 Gestión de Inventario</h4>
-        @if (esTI) {
-          <button class="btn btn-light btn-sm fw-bold">+ Nuevo Producto</button>
-        }
-      </div>
-  
-      <div class="card-body">
-        <div class="row g-3 mb-4 bg-light p-3 rounded border">
-          <div class="col-md-5">
-            <label class="form-label fw-bold small text-muted">Categoría</label>
-            <select class="form-select" (change)="aplicarFiltro($event, 'categoria')">
-              <option value="0">--- Todas las Categorías ---</option>
-              <option value="1">Electrónica</option>
-              <option value="2">Alimentos</option>
-              <option value="3">Ferretería</option>
-            </select>
-          </div>
-          <div class="col-md-5">
-            <label class="form-label fw-bold small text-muted">Filtrar por Almacén</label>
-            <select class="form-select" (change)="aplicarFiltro($event, 'almacen')">
-              <option value="0">--- Todos los Almacenes ---</option>
-              <option value="1">Almacén Central (Lima)</option>
-              <option value="2">Almacén Sur (Arequipa)</option>
-              <option value="3">Almacén Norte (Trujillo)</option>
-              <option value="4">Almacén Callao (Callao)</option> </select>
-          </div>
-          <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-outline-secondary w-100 btn-sm" (click)="cargarProductos()">
-              <i class="bi bi-arrow-clockwise"></i> Limpiar
-            </button>
-          </div>
-        </div>
-  
-        <table class="table table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>SKU</th> 
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th class="text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (prod of listaProductos; track prod.productoId) {
-              <tr>
-                <td><span class="badge bg-secondary">{{ prod.sku }}</span></td>
-                <td><strong>{{ prod.nombre }}</strong></td>
-                <td class="text-muted small">{{ prod.descripcion || 'Sin descripción' }}</td>
-                <td>{{ prod.precioLista | currency:'PEN ':'symbol' }}</td>
-                <td>
-                  <span [class]="(prod.stock || 0) < 10 ? 'badge bg-danger' : 'badge bg-success'">
-                    {{ prod.stock || 0 }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  @if (esTI) {
-                    <button class="btn btn-outline-info btn-sm me-1"><i class="bi bi-pencil"></i></button>
-                    <button (click)="eliminar(prod.productoId)" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-                  } @else {
-                    <span class="badge rounded-pill bg-light text-dark border">Lectura</span>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="6" class="text-center py-4 text-muted">No se encontraron productos.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+
+  <h2 class="titulo">Inventario General</h2>
+  <p class="subtitulo">Consulta el stock disponible por almacén y categoría.</p>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <select class="form-control" [(ngModel)]="almacenId" (change)="filtrar()">
+      <option value="">Todos los Almacenes</option>
+      <option *ngFor="let a of almacenes" [value]="a.almacenId">
+        {{ a.nombre }}
+      </option>
+    </select>
+
+    <select class="form-control" [(ngModel)]="categoriaId" (change)="filtrar()">
+      <option value="">Todas las Categorías</option>
+      <option *ngFor="let c of categorias" [value]="c.categoriaId">
+        {{ c.nombre }}
+      </option>
+    </select>
   </div>
+
+  <!-- Tabla -->
+  <table class="table tabla-inv mt-4">
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th>Stock Total</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of productos">
+        <td>{{ p.sku }}</td>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.categoria?.nombre }}</td>
+        <td>{{ p.stock }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

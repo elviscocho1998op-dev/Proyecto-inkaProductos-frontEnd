@@ -1,145 +1,126 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ComprasService } from '../../services/compras.service';
+import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
-import { Producto } from '../../models/producto.models';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-compras',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './compras.component.html',
-  styleUrl: './compras.component.css'
+  styleUrls: ['./compras.component.css']
 })
 export class ComprasComponent implements OnInit {
-  listaProductos: Producto[] = [];
-  carrito: Producto[] = []; 
-  
-  // Almacenes por defecto
-  almacenOrigen: number = 1;
-  almacenDestino: number = 2;
-  
-  // Filtros
-  catSeleccionada: number = 0;
-  almSeleccionado: number = 0;
 
-  // --- SIMULACIÓN DE USUARIO LOGUEADO ---
-  // Cambia este valor manualmente para probar los 3 perfiles el domingo:
-  // 1. 'admin@inkaproductos.com'
-  // 2. 'user@inkaproductos.com'
-  // 3. 'gestionti@inkaproductos.com'
-  usuarioActual: string = 'admin@inkaproductos.com'; 
+  almacenes: any[] = [];
+  productosFiltrados: any[] = [];
+  carrito: any[] = [];
 
-  constructor(private apiService: ApiService) {}
+  origenId: number = 0;
+  destinoId: number = 0;
+
+  esAdmin: boolean = false;
+  usuarioEmail: string = '';
+
+  constructor(
+    private comprasService: ComprasService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.obtenerProductos();
+    this.esAdmin = this.auth.getRol() === 'ADMIN';
+    this.usuarioEmail = this.auth.getEmail();
+
+    this.cargarData();
   }
 
-  obtenerProductos(): void {
-    this.apiService.getProductos().subscribe({
-      next: (data) => this.listaProductos = data,
-      error: (err) => console.error('Error al cargar productos:', err)
-    });
+  cargarData() {
+    this.comprasService.getAlmacenes().subscribe(r => this.almacenes = r);
   }
 
-  agregarAlCarrito(producto: Producto, cantidad: string | number): void {
-    const cantNumerica = Number(cantidad);
-    if (cantNumerica <= 0) return;
-
-    const stockDisponible = producto.stock ?? 0;
-    if (cantNumerica > stockDisponible) {
-      alert(`⚠️ Stock insuficiente en el origen. Disponible: ${stockDisponible}`);
+  // FILTRAR PRODUCTOS SEGÚN ALMACÉN ORIGEN
+  filtrarProductos() {
+    if (!this.origenId) {
+      this.productosFiltrados = [];
       return;
     }
 
-    const itemExistente = this.carrito.find(item => item.productoId === producto.productoId);
-
-    if (itemExistente) {
-      const nuevaCantidad = (itemExistente.cantidadSeleccionada ?? 0) + cantNumerica;
-      if (nuevaCantidad > stockDisponible) {
-        alert(`⚠️ No puedes agregar más. El total en carrito excedería el stock disponible.`);
-        return;
-      }
-      itemExistente.cantidadSeleccionada = nuevaCantidad;
-    } else {
-      this.carrito.push({
-        ...producto,
-        cantidadSeleccionada: cantNumerica
-      });
-    }
+    this.comprasService.filtrarProductos(this.origenId)
+      .subscribe(r => this.productosFiltrados = r);
   }
 
-  aplicarFiltro(event: any, tipo: string) {
-    const valor = Number(event.target.value);
-    if (tipo === 'categoria') {
-      this.catSeleccionada = valor;
-    } else {
-      this.almSeleccionado = valor;
-    }
-  
-    // Se añade ': any' a data y err para quitar los errores de TypeScript
-    this.apiService.filtrarProductos(this.catSeleccionada, this.almSeleccionado).subscribe({
-      next: (data: any) => {
-        this.listaProductos = data;
-      },
-      error: (err: any) => {
-        console.error('Error al filtrar:', err);
-      }
+  // AGREGAR AL CARRITO
+  agregarAlCarrito(prod: any, cant: number) {
+    cant = Number(cant);
+    if (cant <= 0) return;
+
+    this.carrito.push({
+      productoId: prod.productoId,
+      nombre: prod.nombre,
+      cantidad: cant,
+      sku: prod.sku
     });
   }
 
-  confirmarTransaccion(): void {
-    const origenId = Number(this.almacenOrigen);
-    const destinoId = Number(this.almacenDestino);
-  
-    if (origenId === destinoId) {
-      alert("❌ Error: El almacén de origen y destino no pueden ser iguales.");
-      return;
-    }
-  
-    if (this.carrito.length === 0) {
-      alert("🛒 El carrito está vacío.");
-      return;
-    }
-  
-    // --- LÓGICA DINÁMICA DE USUARIO ---
-    // Determinamos si es Admin basándonos en el correo actual
-    const esAdmin = this.usuarioActual === 'admin@inkaproductos.com';
-
-    const datosCompra = {
-      origenId: origenId,
-      destinoId: destinoId,
-      usuarioEmail: this.usuarioActual, // Dinámico
-      esAdmin: esAdmin,                 // Dinámico: true para admin, false para los demás
-      items: this.carrito.map(item => ({
-          productoId: item.productoId,
-          cantidad: item.cantidadSeleccionada
-      }))
-    };
-  
-    console.log('Enviando a Java:', datosCompra);
-  
-    this.apiService.realizarCompra(datosCompra).subscribe({
-      next: (res) => {
-        // Personalizamos el mensaje según el perfil
-        if (esAdmin) {
-          alert('✅ ¡Transacción Exitosa! (Stock actualizado inmediatamente)');
-        } else {
-          alert('⏳ Solicitud enviada con éxito. (Pendiente de aprobación por el Admin)');
-        }
-        
-        this.vaciarCarrito();
-        this.obtenerProductos(); 
-      },
-      error: (err) => {
-        console.error('Error del servidor:', err);
-        alert('❌ No se pudo completar la operación. Verifique la conexión con el servidor Java.');
-      }
-    });
-  }
-
-  vaciarCarrito(): void {
+  vaciarCarrito() {
     this.carrito = [];
   }
+
+  // CONFIRMAR OPERACIÓN
+  confirmarOperacion() {
+    if (!this.origenId || !this.destinoId) {
+      alert("Debes seleccionar almacén origen y destino.");
+      return;
+    }
+
+    if (this.origenId === this.destinoId) {
+      alert("El origen y destino deben ser distintos.");
+      return;
+    }
+
+    if (this.carrito.length === 0) {
+      alert("No hay productos en el carrito.");
+      return;
+    }
+
+    const payload = {
+      origenId: this.origenId,
+      destinoId: this.destinoId,
+      usuarioEmail: this.usuarioEmail,
+      esAdmin: this.esAdmin,
+      items: this.carrito.map(c => ({
+        productoId: c.productoId,
+        cantidad: c.cantidad
+      }))
+    };
+
+    // USER → SOLO ENVÍA SOLICITUD
+    if (!this.esAdmin) {
+      this.comprasService.enviarSolicitud(payload).subscribe({
+        next: () => {
+          alert("Solicitud enviada al administrador.");
+          this.vaciarCarrito();
+        },
+        error: err => {
+          console.error(err);
+          alert(err.error?.message || "Error al enviar solicitud.");
+        }
+      });
+      return;
+    }
+
+    // ADMIN → REALIZA MOVIMIENTO REAL
+    this.comprasService.realizarTransaccion(payload).subscribe({
+      next: () => {
+        alert("Movimiento realizado con éxito.");
+        this.vaciarCarrito();
+      },
+      error: err => {
+        console.error(err);
+        alert(err.error?.message || "Error al procesar transacción.");
+      }
+    });
+  }
+
 }

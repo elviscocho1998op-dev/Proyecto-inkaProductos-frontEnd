@@ -3,6 +3,7 @@ import { RouterOutlet, Router } from '@angular/router'; // 1. Agregamos Router a
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { CommonModule } from '@angular/common'; // 2. Agregamos CommonModule por si usas directivas
 
+
 @Component({
   selector: 'app-root',
   standalone: true,

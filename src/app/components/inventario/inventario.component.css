@@ -1,0 +1,21 @@
+.titulo {
+    font-size: 32px;
+    font-weight: bold;
+  }
+  
+  .subtitulo {
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .filtros {
+    display: flex;
+    gap: 15px;
+    max-width: 500px;
+  }
+  
+  .tabla-inv th {
+    background-color: #f4f6ff;
+    font-weight: bold;
+  }
+  

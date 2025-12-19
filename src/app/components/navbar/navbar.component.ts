@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; // ajusta ruta si difiere
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,22 +11,41 @@ import { AuthService } from '../../services/auth.service'; // ajusta ruta si dif
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
-  rolLabel: string = 'Invitado';
-  emailLabel: string = '';
+
+  usuarioNombre: string = 'Invitado';
+  email: string = '';
+  rol: string = '';
 
   constructor(private router: Router, private auth: AuthService) {}
 
   ngOnInit() {
-    const email = this.auth.getEmail?.() ?? localStorage.getItem('auth_email'); // por si aún no agregas getEmail()
-    this.emailLabel = email ?? '';
+    const user = this.auth.obtenerUsuario(); // <--- se obtiene desde localStorage
 
-    // Solo para mostrar (UI). La seguridad real está en Spring.
-    const hint = this.auth.getRoleHint?.() ?? null;
-    this.rolLabel = hint ?? (this.emailLabel ? 'Usuario' : 'Invitado');
+    if (user) {
+      this.email = user.email;
+      this.rol = (user.rol || '').replace('ROLE_', '');
+
+      // Nombre visible en el navbar
+      if (user.username) {
+        this.usuarioNombre = user.username;
+      } else if (user.nombre) {
+        this.usuarioNombre = user.nombre;
+      } else {
+        // Si no hay nombre, mostramos el correo
+        this.usuarioNombre = user.email;
+      }
+    }
   }
 
+  // Lógica de roles
+  esAdmin() { return this.rol === 'ADMIN'; }
+  esUser()  { return this.rol === 'USER'; }
+  esTI()    { return this.rol === 'TI'; }
+
+  // Logout CORREGIDO
   onLogout() {
-    this.auth.logout();
+    // Tu AuthService usa "usuario" como clave en el localStorage
+    localStorage.removeItem('usuario');
     this.router.navigate(['/login']);
   }
 }

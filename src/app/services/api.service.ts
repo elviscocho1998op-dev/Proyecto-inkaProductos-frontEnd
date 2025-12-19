@@ -1,66 +1,74 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Producto } from '../models/producto.models';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ApiService {
 
-  private apiUrl = 'http://localhost:8081/api/productos';
-  private authUrl = 'http://localhost:8081/api/auth';
+  private baseUrl = 'http://localhost:8081';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // 1. Método de Login
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.authUrl}/login`, credentials);
+  private authHeader(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders(token ? { Authorization: token } : {});
   }
 
-  // 2. Generador de Headers (Para evitar repetir código)
-  private getAuthHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Authorization': 'Basic ' + btoa('admin@inkaproductos.com:admin123')
+  // LOGIN
+  login(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/login`, data);
+  }
+
+  // PRODUCTOS
+  getProductos(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/api/productos`);
+  }
+
+  filtrar(categoriaId?: number, almacenId?: number): Observable<any[]> {
+    const params: any = {};
+    if (categoriaId) params.categoriaId = categoriaId;
+    if (almacenId) params.almacenId = almacenId;
+
+    return this.http.get<any[]>(`${this.baseUrl}/api/productos/filtrar`, { params });
+  }
+
+  // TRANSACCIÓN - SOLO ADMIN
+  procesarTransaccion(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/productos/transaccion`, data, {
+      headers: this.authHeader()
     });
   }
 
-  // 3. Obtener productos
-  getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
+  // MIS SOLICITUDES (USER)
+  getMisSolicitudes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/api/productos/transaccion/mias`, {
+      headers: this.authHeader()
+    });
   }
 
-  // 4. FILTRAR PRODUCTOS (Este es el que faltaba)
-  filtrarProductos(categoriaId?: number, almacenId?: number): Observable<Producto[]> {
-    let params = new HttpParams();
-    if (categoriaId && categoriaId > 0) params = params.set('categoriaId', categoriaId.toString());
-    if (almacenId && almacenId > 0) params = params.set('almacenId', almacenId.toString());
-
-    return this.http.get<Producto[]>(`${this.apiUrl}/filtrar`, { params });
-  }
-
-  // 5. Eliminar
-  eliminarProducto(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
-  }
-
-  // 6. Guardar
-  guardarProducto(producto: Producto): Observable<Producto> {
-    return this.http.post<Producto>(this.apiUrl, producto, { headers: this.getAuthHeaders() });
-  }
-
-  // 7. Realizar Compra
-  realizarCompra(datos: any): Observable<any> {
-    const payload = { 
-      ...datos, 
-      usuarioEmail: 'admin@inkaproductos.com', 
-      esAdmin: true 
-    };
-    return this.http.post(`${this.apiUrl}/transaccion`, payload, { headers: this.getAuthHeaders() });
-  }
-
-  // 8. Historial
+  // HISTORIAL
   getHistorial(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/transaccion/historial`, { headers: this.getAuthHeaders() });
+    return this.http.get<any[]>(`${this.baseUrl}/api/productos/transaccion/historial`, {
+      headers: this.authHeader()
+    });
+  }
+
+  // APROBACIONES (ADMIN)
+  getPendientes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/api/aprobaciones/pendientes`, {
+      headers: this.authHeader()
+    });
+  }
+
+  aprobarSolicitud(id: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/api/aprobaciones/${id}/aprobar`, {}, {
+      headers: this.authHeader()
+    });
+  }
+
+  rechazarSolicitud(id: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/api/aprobaciones/${id}/rechazar`, {}, {
+      headers: this.authHeader()
+    });
   }
 }

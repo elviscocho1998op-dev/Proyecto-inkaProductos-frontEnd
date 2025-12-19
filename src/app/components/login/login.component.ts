@@ -1,32 +1,35 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './login.component.html'
+  imports: [CommonModule, FormsModule],   // <-- AQUÍ ESTÁ LA SOLUCIÓN
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  email = '';
-  password = '';
+
+  email: string = '';
+  password: string = '';
+  error: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  onLogin() {
-    if (!this.email || !this.password) {
-      alert('Por favor, ingrese sus credenciales');
-      return;
-    }
+  ingresar() {
+    this.error = '';
 
-    // Opción A: no llamamos al backend aquí.
-    // Guardamos credenciales para que el interceptor mande Basic Auth en cada request.
-    this.authService.login(this.email.trim(), this.password);
-
-    // Redirigimos al inicio
-    this.router.navigate(['/inicio']);
+    this.authService.login(this.email, this.password).subscribe({
+      next: (user) => {
+        this.authService.guardarUsuario(user, this.password);
+        this.router.navigate(['/inicio']);
+      },
+      error: () => {
+        this.error = 'Credenciales incorrectas';
+      }
+    });
   }
 }

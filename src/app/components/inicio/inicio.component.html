@@ -1,65 +1,120 @@
 <div class="container mt-4">
-    <div class="header-section mb-5">
-      <h1 class="fw-bold">Bienvenido a Inka Productos</h1>
-      <p class="text-muted">Tu plataforma integral para la gestión de inventario y productos.</p>
-    </div>
-  
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm p-3 border-start border-primary border-5">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title fw-bold">Módulo de Compras</h5>
-            <p class="card-text text-muted flex-grow-1">Realiza traslados entre almacenes y gestiona nuevas entradas.</p>
-            <a routerLink="/compras" class="btn btn-primary w-100 mt-3 fw-bold">
-                Ir al Módulo
-            </a>
-          </div>
-        </div>
-      </div>
-  
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm p-3 border-start border-success border-5">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title fw-bold">Historial</h5>
-            <p class="card-text text-muted flex-grow-1">Consulta el registro detallado de todas tus transacciones y traslados realizados.</p>
-            <a routerLink="/historial" class="btn btn-success w-100 mt-3 fw-bold">
-                Ver Historial
-            </a>
-          </div>
-        </div>
-      </div>
-  
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm p-3 border-start border-info border-5">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title fw-bold">Inventario Actual</h5>
-            <p class="card-text text-muted flex-grow-1">Consulta el stock disponible por almacén en tiempo real.</p>
-            <a routerLink="/inventario" class="btn btn-info text-white w-100 mt-3 fw-bold">
-                Ver Inventario
-            </a>
-          </div>
-        </div>
-      </div>
-  
-      <div class="col-md-12 mt-4">
-        <div class="card border-0 shadow-sm p-3 border-start border-warning border-5">
-          <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-              <h5 class="card-title fw-bold">Gestión de Productos</h5>
-              <p class="card-text text-muted mb-0">Administra el catálogo: crea y edita artículos, categorías y almacenes.</p>
-            </div>
-            <a routerLink="/gestion-producto" class="btn btn-warning fw-bold px-5">
-                Ir a Gestión
-            </a>
-          </div>
-        </div>
+    
+  <div class="header-section mb-5">
+    <h1 class="fw-bold">Bienvenido a Inka Productos</h1>
+    <p class="text-muted">Tu plataforma integral para la gestión de inventario y productos.</p>
+  </div>
+
+
+  <!-- =============================== -->
+  <!-- ADMIN -->
+  <!-- =============================== -->
+  <div class="row g-4" *ngIf="esAdmin()">
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-info border-5">
+        <h5 class="fw-bold">Inventario Actual</h5>
+        <p class="text-muted">Consulta el stock por almacén.</p>
+        <a routerLink="/inventario" class="btn btn-info text-white fw-bold mt-auto">Ver Inventario</a>
       </div>
     </div>
-  
-    <div class="alert alert-primary mt-5 d-flex align-items-center" role="alert">
-      <i class="bi bi-info-circle-fill me-2"></i>
-      <div class="small">
-        <strong>Consejo:</strong> Usa el <strong>Módulo de Compras</strong> para mover stock entre tus almacenes y el <strong>Historial</strong> para auditar los cambios.
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-success border-5">
+        <h5 class="fw-bold">Movimientos de Stock</h5>
+        <p class="text-muted">Registra entradas, salidas y traslados.</p>
+        <a routerLink="/compras" class="btn btn-success fw-bold mt-auto">Registrar Movimiento</a>
       </div>
     </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-warning border-5">
+        <h5 class="fw-bold">Aprobaciones</h5>
+        <p class="text-muted">Gestiona solicitudes de usuarios.</p>
+        <a routerLink="/aprobaciones" class="btn btn-warning fw-bold mt-auto">Ir a Aprobaciones</a>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+  <!-- =============================== -->
+  <!-- USER -->
+  <!-- =============================== -->
+  <div class="row g-4" *ngIf="esUser()">
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-info border-5">
+        <h5 class="fw-bold">Inventario</h5>
+        <p class="text-muted">Consulta el stock disponible.</p>
+        <a routerLink="/inventario" class="btn btn-info text-white fw-bold mt-auto">Ver Inventario</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-primary border-5">
+        <h5 class="fw-bold">Crear Solicitud</h5>
+        <p class="text-muted">Envía solicitudes de compra o traslado.</p>
+        <a routerLink="/compras" class="btn btn-primary fw-bold mt-auto">Crear Solicitud</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-success border-5">
+        <h5 class="fw-bold">Mis Solicitudes</h5>
+        <p class="text-muted">Revisa el estado de tus solicitudes.</p>
+        <a routerLink="/historial" class="btn btn-success fw-bold mt-auto">Ver Historial</a>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+  <!-- =============================== -->
+  <!-- TI -->
+  <!-- =============================== -->
+  <div class="row g-4" *ngIf="esTI()">
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-info border-5">
+        <h5 class="fw-bold">Inventario</h5>
+        <p class="text-muted">Consulta el estado general del stock.</p>
+        <a routerLink="/inventario" class="btn btn-info text-white fw-bold mt-auto">Ver Inventario</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-danger border-5">
+        <h5 class="fw-bold">Gestión de Usuarios</h5>
+        <p class="text-muted">Administra usuarios y permisos del sistema.</p>
+        <a routerLink="/roles" class="btn btn-danger text-white fw-bold mt-auto">Administrar</a>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm p-3 border-start border-warning border-5">
+        <h5 class="fw-bold">Tickets TI</h5>
+        <p class="text-muted">Atiende solicitudes técnicas.</p>
+        <a routerLink="/tickets" class="btn btn-warning fw-bold mt-auto">Ver Tickets</a>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <!-- =============================== -->
+  <!-- CONSEJO FINAL -->
+  <!-- =============================== -->
+  <div class="alert alert-primary mt-5 d-flex align-items-center" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    <div class="small">
+      <strong>Consejo:</strong> Empieza creando tus Categorías y Almacenes en el menú de Configuración.
+    </div>
+  </div>
+
 </div>

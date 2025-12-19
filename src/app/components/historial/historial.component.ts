@@ -1,51 +1,57 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { ProductService } from '../../services/product.service';
+
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-historial',
   standalone: true,
-  imports: [CommonModule], 
+  imports: [CommonModule],
   templateUrl: './historial.component.html',
-  styleUrl: './historial.component.css'
+  styleUrls: ['./historial.component.css']
 })
 export class HistorialComponent implements OnInit {
-  
-  // Lista que almacena el historial de movimientos
-  listaHistorial: any[] = []; 
 
+  historial: any[] = [];
+  rol: string = '';
+  email: string = '';
 
-  detalleSeleccionado: number | null = null;
-
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private auth: AuthService,
+    private productService: ProductService
+  ) {}
 
   ngOnInit(): void {
-    this.cargarDatos();
-  }
 
-  cargarDatos(): void {
-    this.apiService.getHistorial().subscribe({
-      next: (data) => {
-        this.listaHistorial = data.sort((a: any, b: any) => 
-          new Date(b.fechaSolicitud).getTime() - new Date(a.fechaSolicitud).getTime()
-        );
-      },
-      error: (err) => {
-        console.error('Error al cargar historial:', err);
-      }
-    });
-  }
+    const usuario = this.auth.obtenerUsuario();
 
-  toggleDetalle(id: number): void {
-    this.detalleSeleccionado = this.detalleSeleccionado === id ? null : id;
-  }
+    if (!usuario) return;
 
-  obtenerClaseEstado(estado: string): string {
-    switch (estado) {
-      case 'APROBADA': return 'badge bg-success';
-      case 'PENDIENTE': return 'badge bg-warning text-dark';
-      case 'RECHAZADA': return 'badge bg-danger';
-      default: return 'badge bg-secondary';
+    this.rol = usuario.rol;
+    this.email = usuario.email;
+
+    // ADMIN → historial de movimientos reales
+    if (this.rol === 'ADMIN') {
+
+      this.productService.getHistorialGeneral()
+        .subscribe((res: any[]) => {
+          this.historial = res.map(m => ({ ...m, expanded: false }));
+        });
+
+    // USER → solicitudes enviadas
+    } else {
+
+      this.productService.getMisSolicitudes(this.email)
+        .subscribe((res: any[]) => {
+          this.historial = res.map(s => ({ ...s, expanded: false }));
+        });
+
     }
   }
+
+  toggle(item: any) {
+    item.expanded = !item.expanded;
+  }
+
 }

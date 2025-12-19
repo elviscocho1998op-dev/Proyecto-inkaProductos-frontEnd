@@ -1,23 +1,18 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  constructor(private auth: AuthService) {}
+export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
+  const auth = inject(AuthService);
+  const token = auth.getAuthHeader();
 
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
-    const header = this.auth.getAuthHeader();
-
-    // Si no hay credenciales guardadas, manda el request normal
-    if (!header) return next.handle(req);
-
-    // Adjunta Authorization a todo request hacia tu backend
-    const isApi = req.url.startsWith('http://localhost:8081/');
-    if (!isApi) return next.handle(req);
-
-    return next.handle(req.clone({
-      setHeaders: { Authorization: header }
-    }));
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: token
+      }
+    });
   }
-}
+
+  return next(req);
+};

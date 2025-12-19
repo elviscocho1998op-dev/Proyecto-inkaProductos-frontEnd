@@ -1,58 +1,69 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api.service';
+import { AprobacionesService } from '../../services/aprobaciones.service';
 
 @Component({
   selector: 'app-aprobaciones',
   standalone: true,
-  // IMPORTANTE: CommonModule es necesario para usar @for, @if y pipes en el HTML
-  imports: [CommonModule], 
+  imports: [CommonModule],
   templateUrl: './aprobaciones.component.html',
-  styleUrl: './aprobaciones.component.css'
+  styleUrls: ['./aprobaciones.component.css']
 })
 export class AprobacionesComponent implements OnInit {
-  
-  // Lista de solicitudes que esperan revisión
-  solicitudesPendientes: any[] = [];
-  detalleSeleccionado: number | null = null;
 
-  constructor(private apiService: ApiService) {}
+  solicitudes: any[] = [];
+
+  constructor(private aprobacionesService: AprobacionesService) {}
 
   ngOnInit(): void {
     this.cargarPendientes();
   }
 
-  /**
-   * Obtiene las solicitudes desde el backend.
-   * Filtramos para mostrar solo las que están en estado 'PENDIENTE'.
-   */
-  cargarPendientes(): void {
-    this.apiService.getHistorial().subscribe({
-      next: (data) => {
-        // Usamos el filtro para mostrar solo lo que el admin debe aprobar
-        this.solicitudesPendientes = data.filter((s: any) => s.estado === 'PENDIENTE');
+  cargarPendientes() {
+    this.aprobacionesService.getPendientes().subscribe((res: any[]) => {
+      this.solicitudes = res.map(s => ({ ...s, expanded: false }));
+    });
+  }
+
+  // 🔹 EXPANDIR / OCULTAR PRODUCTOS
+  toggle(sol: any) {
+    sol.expanded = !sol.expanded;
+  }
+
+  // 🔹 APROBAR SOLICITUD
+  aprobar(sol: any) {
+    if (!confirm("¿Aprobar esta solicitud?")) return;
+
+    this.aprobacionesService.aprobar(sol.solicitudId).subscribe({
+      next: () => {
+        alert("Solicitud aprobada correctamente");
+
+        // Quitamos la tarjeta aprobada del listado
+        this.solicitudes = this.solicitudes.filter(s => s.solicitudId !== sol.solicitudId);
       },
-      error: (err) => {
-        console.error('Error al cargar aprobaciones:', err);
+      error: err => {
+        console.error(err);
+        alert(err.error?.message || "Error al aprobar la solicitud");
       }
     });
   }
 
-  /**
-   * Cambia el estado de una solicitud. 
-   * @param id ID de la solicitud
-   * @param nuevoEstado 'APROBADA' o 'RECHAZADA'
-   */
-  procesarSolicitud(id: number, nuevoEstado: string): void {
-    // Aquí llamarías a un método de tu apiService para actualizar el estado en Java
-    console.log(`Solicitud ${id} cambiada a ${nuevoEstado}`);
-    
-    // Simulación: actualizamos la lista local para que desaparezca de la bandeja
-    this.solicitudesPendientes = this.solicitudesPendientes.filter(s => s.solicitudId !== id);
-    alert(`La solicitud ha sido ${nuevoEstado} con éxito.`);
+  // 🔹 RECHAZAR SOLICITUD
+  rechazar(sol: any) {
+    if (!confirm("¿Rechazar esta solicitud?")) return;
+
+    this.aprobacionesService.rechazar(sol.solicitudId).subscribe({
+      next: () => {
+        alert("Solicitud rechazada");
+
+        // Quitamos del listado
+        this.solicitudes = this.solicitudes.filter(s => s.solicitudId !== sol.solicitudId);
+      },
+      error: err => {
+        console.error(err);
+        alert(err.error?.message || "Error al rechazar la solicitud");
+      }
+    });
   }
 
-  toggleDetalle(id: number): void {
-    this.detalleSeleccionado = this.detalleSeleccionado === id ? null : id;
-  }
 }
