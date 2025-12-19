@@ -25,29 +25,53 @@ export class HistorialComponent implements OnInit {
   ngOnInit(): void {
 
     const usuario = this.auth.obtenerUsuario();
-
     if (!usuario) return;
 
-    this.rol = usuario.rol;
-    this.email = usuario.email;
+    this.rol = usuario.rol ?? '';
+    this.email = usuario.email ?? '';
 
-    // ADMIN → historial de movimientos reales
-    if (this.rol === 'ADMIN') {
+    // 🔍 Normalizar el rol (porque Spring suele devolver ROLE_ADMIN, ROLE_USER)
+    const r = this.rol.toUpperCase();
 
+    const esAdmin = r.includes('ADMIN');   // ATRAPA ADMIN y ROLE_ADMIN
+    const esUser  = r.includes('USER');    // ATRAPA USER y ROLE_USER
+
+    // ===============================
+    // ADMIN → historial general REAL
+    // ===============================
+    if (esAdmin) {
       this.productService.getHistorialGeneral()
-        .subscribe((res: any[]) => {
-          this.historial = res.map(m => ({ ...m, expanded: false }));
+        .subscribe({
+          next: (res: any[]) => {
+            this.historial = res.map(m => ({ ...m, expanded: false }));
+          },
+          error: (err) => {
+            console.error("Error historial general:", err);
+          }
         });
-
-    // USER → solicitudes enviadas
-    } else {
-
-      this.productService.getMisSolicitudes(this.email)
-        .subscribe((res: any[]) => {
-          this.historial = res.map(s => ({ ...s, expanded: false }));
-        });
-
+      return;
     }
+
+    // ==================================
+    // USER → listar solicitudes propias
+    // ==================================
+    if (esUser) {
+      this.productService.getMisSolicitudes(this.email)
+        .subscribe({
+          next: (res: any[]) => {
+            this.historial = res.map(s => ({ ...s, expanded: false }));
+          },
+          error: (err) => {
+            console.error("Error solicitudes:", err);
+          }
+        });
+      return;
+    }
+
+    // ====================================================
+    // TI o cualquier otro → Por ahora no muestra historial
+    // ====================================================
+    console.warn("Rol no soportado aún:", this.rol);
   }
 
   toggle(item: any) {

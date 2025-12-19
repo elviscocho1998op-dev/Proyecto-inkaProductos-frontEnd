@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 })
 export class ProductService {
 
-  private movimientosUrl = 'http://localhost:8081/api/productos/transaccion';
+  private movimientosUrl = 'http://localhost:8081/api/movimientos';
   private solicitudesUrl = 'http://localhost:8081/api/solicitudes';
 
   constructor(
