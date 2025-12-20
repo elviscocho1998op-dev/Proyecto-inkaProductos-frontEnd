@@ -30,15 +30,15 @@ export class HistorialComponent implements OnInit {
     this.rol = usuario.rol ?? '';
     this.email = usuario.email ?? '';
 
-    // 🔍 Normalizar el rol (porque Spring suele devolver ROLE_ADMIN, ROLE_USER)
+    //NORMALIZA ROLES
     const r = this.rol.toUpperCase();
 
-    const esAdmin = r.includes('ADMIN');   // ATRAPA ADMIN y ROLE_ADMIN
-    const esUser  = r.includes('USER');    // ATRAPA USER y ROLE_USER
+    const esAdmin = r.includes('ADMIN');   
+    const esUser  = r.includes('USER');  
 
-    // ===============================
-    // ADMIN → historial general REAL
-    // ===============================
+
+    // ADMIN  historial general REAL
+
     if (esAdmin) {
       this.productService.getHistorialGeneral()
         .subscribe({
@@ -52,9 +52,9 @@ export class HistorialComponent implements OnInit {
       return;
     }
 
-    // ==================================
-    // USER → listar solicitudes propias
-    // ==================================
+
+    // USER  listar solicitudes propias
+ 
     if (esUser) {
       this.productService.getMisSolicitudes(this.email)
         .subscribe({
@@ -67,10 +67,7 @@ export class HistorialComponent implements OnInit {
         });
       return;
     }
-
-    // ====================================================
-    // TI o cualquier otro → Por ahora no muestra historial
-    // ====================================================
+// ASIGNA ROL
     console.warn("Rol no soportado aún:", this.rol);
   }
 

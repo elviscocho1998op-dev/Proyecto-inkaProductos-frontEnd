@@ -25,12 +25,12 @@ export class AprobacionesComponent implements OnInit {
     });
   }
 
-  // 🔹 EXPANDIR / OCULTAR PRODUCTOS
+  // EXPANDIR / OCULTAR PRODUCTOS
   toggle(sol: any) {
     sol.expanded = !sol.expanded;
   }
 
-  // 🔹 APROBAR SOLICITUD
+  // APROBAR SOLICITUD
   aprobar(sol: any) {
     if (!confirm("¿Aprobar esta solicitud?")) return;
 
@@ -48,7 +48,7 @@ export class AprobacionesComponent implements OnInit {
     });
   }
 
-  // 🔹 RECHAZAR SOLICITUD
+  //  RECHAZAR SOLICITUD
   rechazar(sol: any) {
     if (!confirm("¿Rechazar esta solicitud?")) return;
 

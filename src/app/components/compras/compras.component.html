@@ -1,6 +1,5 @@
 <div class="container-fluid mt-4">
 
-  <!-- PANEL DE ALMACENES -->
   <div class="card shadow-lg border-0 rounded-4 mb-4">
     <div class="card-body p-4">
 
@@ -10,7 +9,7 @@
 
       <div class="row g-4 align-items-end">
 
-        <!-- ORIGEN -->
+
         <div class="col-md-5">
           <label class="fw-semibold">Almacén Origen</label>
           <select class="form-select form-select-lg shadow-sm"
@@ -28,7 +27,6 @@
           <i class="bi bi-arrow-right-circle-fill text-success display-5"></i>
         </div>
 
-        <!-- DESTINO -->
         <div class="col-md-5">
           <label class="fw-semibold">Almacén Destino</label>
           <select class="form-select form-select-lg shadow-sm"
@@ -45,10 +43,9 @@
     </div>
   </div>
 
-  <!-- CONTENEDOR DE DOS COLUMNAS -->
+
   <div class="row g-4">
 
-    <!-- LISTA DE PRODUCTOS -->
     <div class="col-md-8">
       <div class="card shadow-sm border-0 rounded-4">
         <div class="card-header bg-dark text-white fw-bold rounded-top-4">
@@ -57,7 +54,6 @@
 
         <div class="card-body p-0">
 
-          <!-- MENSAJE SI NO HAY PRODUCTOS -->
           <div *ngIf="productosFiltrados.length === 0" class="text-center py-4 text-muted">
             <i class="bi bi-exclamation-circle"></i>
             Seleccione un almacén origen para ver productos.
@@ -107,7 +103,7 @@
       </div>
     </div>
 
-    <!-- CARRITO -->
+
     <div class="col-md-4">
       <div class="carrito card shadow-lg rounded-4 border-0">
 
@@ -117,13 +113,12 @@
 
         <div class="card-body">
 
-          <!-- Carrito vacío -->
+
           <div *ngIf="carrito.length === 0" class="text-center text-muted py-4">
             <i class="bi bi-cart-x display-6"></i>
             <p class="mt-2">Aún no hay productos agregados.</p>
           </div>
 
-          <!-- Lista del carrito -->
           <ul class="list-group mb-3" *ngIf="carrito.length > 0">
 
             <li *ngFor="let c of carrito; let i = index"

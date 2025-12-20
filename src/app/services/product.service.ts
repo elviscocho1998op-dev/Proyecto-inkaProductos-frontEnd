@@ -16,16 +16,14 @@ export class ProductService {
     private auth: AuthService
   ) {}
 
-  // =============================
   // ADMIN — HISTORIAL DE MOVIMIENTOS
-  // =============================
+
   getHistorialGeneral(): Observable<any[]> {
     return this.http.get<any[]>(`${this.movimientosUrl}/historial`);
   }
 
-  // =============================
   // USER — SUS SOLICITUDES
-  // =============================
+
   getMisSolicitudes(email: string): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:8081/api/solicitudes/mias`, {
       params: { email }
@@ -33,9 +31,9 @@ export class ProductService {
   }
   
 
-  // =============================
+
   // USER — Crear solicitud
-  // =============================
+
   crearSolicitud(payload: any): Observable<any> {
     return this.http.post(`${this.solicitudesUrl}`, payload);
   }

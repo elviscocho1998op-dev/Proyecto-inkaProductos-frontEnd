@@ -29,9 +29,9 @@ export class AuthService {
     localStorage.removeItem("usuario");
   }
 
-  // ===============================
-  // ★★ FIX CRÍTICO — getRol correcto
-  // ===============================
+
+  //  FIX CRÍTICO — getRol correcto
+
   getRol(): string {
     const usuario = this.obtenerUsuario();
     if (!usuario) return '';

@@ -3,7 +3,6 @@
   <h2 class="titulo">Inventario General</h2>
   <p class="subtitulo">Consulta el stock disponible por almacén y categoría.</p>
 
-  <!-- Filtros -->
   <div class="filtros">
     <select class="form-control" [(ngModel)]="almacenId" (change)="filtrar()">
       <option value="">Todos los Almacenes</option>
@@ -20,7 +19,6 @@
     </select>
   </div>
 
-  <!-- Tabla -->
   <table class="table tabla-inv mt-4">
     <thead>
       <tr>

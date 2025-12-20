@@ -1,7 +1,7 @@
 export interface ItemCarrito {
     productoId: number;
-    sku: string;        // Visual
-    nombre: string;     // Visual
+    sku: string;       
+    nombre: string;    
     cantidadSeleccionada: number;
   }
   

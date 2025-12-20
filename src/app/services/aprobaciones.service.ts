@@ -16,10 +16,11 @@ export class AprobacionesService {
   }
 
   aprobar(id: number): Observable<any> {
-    return this.http.post(`${this.url}/aprobar/${id}`, {});
+    return this.http.put(`${this.url}/aprobar/${id}`, {});
   }
-
+  
   rechazar(id: number): Observable<any> {
-    return this.http.post(`${this.url}/rechazar/${id}`, {});
+    return this.http.put(`${this.url}/rechazar/${id}`, {});
   }
+  
 }

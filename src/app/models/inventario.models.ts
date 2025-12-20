@@ -19,6 +19,6 @@ export interface Inventario {
         nombre: string;
       };
     };
-    // ESTE es el dato importante: 95 o 105
+
     cantidad: number;
   }

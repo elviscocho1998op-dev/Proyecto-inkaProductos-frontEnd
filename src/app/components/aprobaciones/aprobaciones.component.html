@@ -21,13 +21,11 @@
           <strong>Estado:</strong>
           <span class="badge bg-warning text-dark">{{ s.estado }}</span>
         </p>
-  
-        <!-- BOTÓN EXPANDIR -->
+
         <button class="btn btn-outline-primary btn-sm" (click)="toggle(s)">
           {{ s.expanded ? 'Ocultar productos ▲' : 'Mostrar productos ▼' }}
         </button>
-  
-        <!-- DETALLES -->
+
         <div *ngIf="s.expanded" class="mt-3">
           <h6>Productos solicitados:</h6>
   
@@ -37,8 +35,7 @@
             </li>
           </ul>
         </div>
-  
-        <!-- ACCIONES -->
+
         <div class="mt-3">
           <button class="btn btn-success btn-sm" (click)="aprobar(s)">Aprobar</button>
           <button class="btn btn-danger btn-sm" (click)="rechazar(s)">Rechazar</button>
