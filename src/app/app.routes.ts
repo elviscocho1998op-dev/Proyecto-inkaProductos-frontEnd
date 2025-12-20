@@ -6,6 +6,8 @@ import { InventarioComponent } from './components/inventario/inventario.componen
 import { ComprasComponent } from './components/compras/compras.component';
 import { HistorialComponent } from './components/historial/historial.component';
 import { AprobacionesComponent } from './components/aprobaciones/aprobaciones.component';
+import { TicketTiComponent } from './components/ticket-ti/ticket-ti.component';
+import { UsuariosComponent } from './components/usuarios/usuarios.component';
 
 export const routes: Routes = [
 
@@ -18,7 +20,7 @@ export const routes: Routes = [
   // Página inicio
   { path: 'inicio', component: InicioComponent },
 
-  // Inventario
+  // Inventario general
   { path: 'inventario', component: InventarioComponent },
 
   // Compras
@@ -27,9 +29,13 @@ export const routes: Routes = [
   // Historial
   { path: 'historial', component: HistorialComponent },
 
-  // Aprobaciones
+  // Aprobaciones (ADMIN)
   { path: 'aprobaciones', component: AprobacionesComponent },
 
-  // Página por defecto si ruta no existe
+  // TI – módulos del rol TI
+  { path: 'tickets', component: TicketTiComponent },
+  { path: 'usuarios', component: UsuariosComponent },
+
+  // Página por defecto
   { path: '**', redirectTo: 'inicio' }
 ];
