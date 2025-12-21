@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { InventarioService } from '../../services/inventario.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-inventario',
@@ -19,9 +20,16 @@ export class InventarioComponent implements OnInit {
   categoriaId: number | null = null;
   almacenId: number | null = null;
 
-  constructor(private invService: InventarioService) {}
+  rol: string = "";
+
+  constructor(
+    private invService: InventarioService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.rol = this.auth.getRol();  // ← IMPORTANTE
+
     this.invService.getCategorias().subscribe(r => this.categorias = r);
     this.invService.getAlmacenes().subscribe(r => this.almacenes = r);
     this.cargarTodos();
@@ -35,4 +43,26 @@ export class InventarioComponent implements OnInit {
     this.invService.filtrarProductos(this.categoriaId!, this.almacenId!)
       .subscribe(r => this.productos = r);
   }
+
+  limpiarFiltros() {
+    this.categoriaId = null;
+    this.almacenId = null;
+    this.cargarTodos();
+  }
+  
+
+  editar(prod: any) {
+    alert("Abrir modal de edición para: " + prod.nombre);
+  }
+
+  eliminar(id: number) {
+    if (!confirm("¿Seguro que deseas eliminar el producto?")) return;
+
+    this.invService.eliminar(id).subscribe(() => {
+      this.cargarTodos();
+    });
+  }
+
+ 
+  
 }

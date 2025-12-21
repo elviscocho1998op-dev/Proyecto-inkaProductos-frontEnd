@@ -3,28 +3,12 @@
     <h2 class="mb-4 fw-bold text-primary">Tickets Pendientes</h2>
   
     <div *ngIf="tickets.length === 0" class="alert alert-success shadow-sm">
-      No hay tickets pendientes 🎉
+     Estamos trabajando en ello :D
     </div>
   
-    <div *ngFor="let t of tickets" class="card mb-3 shadow-sm border-0 rounded-3 ticket-card">
-      <div class="card-body">
-  
-        <h5 class="card-title text-dark fw-semibold">{{ t.asunto }}</h5>
-  
-        <p class="card-text text-secondary">
-          <strong>De:</strong> {{ t.emisor }} <br>
-          <strong>Tipo:</strong> {{ t.tipo }} <br>
-          <strong>Prioridad:</strong> {{ t.prioridad }} <br>
-          <strong>Fecha:</strong> {{ t.fechaEnvio | date:'short' }} <br>
-          <strong>Estado:</strong> {{ t.estado }}
-        </p>
-  
-        <p class="mt-2 text-dark">{{ t.contenido }}</p>
-  
-        <button class="btn btn-success mt-3" (click)="atender(t)">
-          ✔ Marcar como Atendido
-        </button>
-  
+    <div class="right-panel">
+      <div class="img-frame">
+        <img src="/images/work.jpg" alt="Friendly User">
       </div>
     </div>
   

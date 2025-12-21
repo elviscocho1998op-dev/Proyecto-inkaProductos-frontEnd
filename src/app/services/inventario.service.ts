@@ -11,29 +11,25 @@ export class InventarioService {
 
   constructor(private http: HttpClient) {}
 
-  getInventarioPorAlmacen(idAlmacen: number): Observable<any> {
-    return this.http.get(`${this.url}/inventario/almacen/${idAlmacen}`);
+  getCategorias(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/categorias`);
   }
 
-  getCategorias(): Observable<any> {
-    return this.http.get(`${this.url}/categorias`);
+  getAlmacenes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/almacenes`);
   }
 
-  getAlmacenes(): Observable<any> {
-    return this.http.get(`${this.url}/almacenes`);
-  }
-  filtrarProductos(categoriaId?: number, almacenId?: number): Observable<any> {
+  filtrarProductos(categoriaId?: number, almacenId?: number): Observable<any[]> {
     let params: any = {};
-  
-    if (categoriaId && categoriaId > 0) {
-      params.categoriaId = categoriaId;
-    }
-  
-    if (almacenId && almacenId > 0) {
-      params.almacenId = almacenId;
-    }
-  
-    return this.http.get(`${this.url}/productos/filtrar`, { params });
+
+    if (categoriaId) params.categoriaId = categoriaId;
+    if (almacenId) params.almacenId = almacenId;
+
+    return this.http.get<any[]>(`${this.url}/productos/filtrar`, { params });
+  }
+
+  eliminar(id: number) {
+    return this.http.delete(`${this.url}/productos/${id}`);
   }
   
 }
